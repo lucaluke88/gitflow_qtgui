@@ -7,15 +7,15 @@ bool hotfix = false;
 bool start = false;
 bool finish = false;
 
+bool add = false;
+bool commit = false;
+bool push = false;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    QPixmap image("gitflow_model.png");
-    ui->label_2->setPixmap(image);
-    ui->label_2->update();
 }
 
 MainWindow::~MainWindow()
@@ -77,6 +77,12 @@ void MainWindow::executeCommand(QString command)
     QProcess process;
     QString currentFolder = ui->currentFolderLine->text();
 
+    if(currentFolder.isEmpty())
+    {
+        currentFolder = QString("/home");
+        ui->currentFolderLine->setText(currentFolder);
+    }
+
     process.setWorkingDirectory(currentFolder);
 
     //process.start(_command);
@@ -91,6 +97,9 @@ void MainWindow::executeCommand(QString command)
         ui->output->setText(output+stdout);
     if(!stderr.isEmpty())
         ui->output->setText(output+QString("ERROR: ")+stderr);
+    if(!stdout.isEmpty() || !stderr.isEmpty())
+        ui->output->setText(output+QString("-------------------------------"));
+    process.close();
 }
 
 void MainWindow::on_featureCheck_toggled(bool checked)
@@ -165,4 +174,75 @@ void MainWindow::on_actionGit_branch_triggered()
 void MainWindow::on_actionGit_flow_init_triggered()
 {
     executeCommand(QString("git flow init"));
+}
+
+void MainWindow::on_addCheck_2_toggled(bool checked)
+{
+    if(checked)
+    {
+        commit = false;
+        push = false;
+        ui->commitCheck_2->setChecked(false);
+        ui->pushCheck->setChecked(false);
+    }
+
+    add = checked;
+    ui->addCheck_2->setChecked(checked);
+
+    ui->horizontalLayout->update();
+}
+
+void MainWindow::on_commitCheck_2_toggled(bool checked)
+{
+    if(checked)
+    {
+        add = false;
+        push = false;
+        ui->addCheck_2->setChecked(false);
+        ui->pushCheck->setChecked(false);
+    }
+
+    commit = checked;
+    ui->commitCheck_2->setChecked(checked);
+
+    ui->horizontalLayout->update();
+}
+
+void MainWindow::on_pushCheck_toggled(bool checked)
+{
+    if(checked)
+    {
+        commit = false;
+        add = false;
+        ui->commitCheck_2->setChecked(false);
+        ui->addCheck_2->setChecked(false);
+    }
+
+    push = checked;
+    ui->pushCheck->setChecked(checked);
+
+    ui->horizontalLayout->update();
+}
+
+void MainWindow::on_execute2button_clicked()
+{
+    QString command("git ");
+
+    if(add)
+        command += QString("add * ");
+    else if(commit)
+    {
+        command += QString("commit -m ' ");
+        command += ui->gitArgument->text();
+        command += QString("' ");
+    }
+    else
+        command += QString("push ");
+
+    executeCommand(command);
+}
+
+void MainWindow::on_executeCustomCommand_clicked()
+{
+    executeCommand(ui->customCommandLabel->text());
 }

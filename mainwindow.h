@@ -39,6 +39,16 @@ class MainWindow : public QMainWindow
 
         void on_actionGit_flow_init_triggered();
 
+        void on_addCheck_2_toggled(bool checked);
+
+        void on_commitCheck_2_toggled(bool checked);
+
+        void on_pushCheck_toggled(bool checked);
+
+        void on_execute2button_clicked();
+
+        void on_executeCustomCommand_clicked();
+
     private:
         Ui::MainWindow *ui;
         QString chooseFolder();
